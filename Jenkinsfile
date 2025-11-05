@@ -2,7 +2,9 @@ pipeline{
   agent any
   stages{
     stage ('Build'){
-      sh ' echo "This is a test on webhook created" '
+      steps{
+        sh ' echo "This is a test on webhook created" '
+      }
     }
   }
 }
