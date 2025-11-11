@@ -15,11 +15,15 @@ pipeline {
         git branch: "${GIT_BRANCH}", url: "${REPO_URL}"
       }
     }
+    stage('check'){
+      steps('checking'){
+        sh 'aws sts get-caller-identity --region ap-south-1'
+      }
+    }
     stage('Package') {
       steps {
         sh 'zip -r emp_det.zip app.py'
-        archiveArtifacts artifacts: 'emp_det.zip
-        aws sts get-caller-identity --region ap-south-1'
+        archiveArtifacts artifacts: 'emp_det.zip'
       }
     }
     stage('Upload to S3') {
