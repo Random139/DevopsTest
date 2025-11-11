@@ -3,7 +3,7 @@ pipeline {
   environment {
     GIT_BRANCH  = 'main'
     REPO_URL    = 'https://github.com/Random139/DevopsTest'
-    S3_BUCKET   = 'demo-bucket'
+    S3_BUCKET   = 'demo-bucket-139-jenkins'
     S3_KEY      = 'emp_det.zip'
     LAMBDA_NAME = 'Emp_details'
     AWS_REGION  = 'ap-south-1'
