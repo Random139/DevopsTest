@@ -17,7 +17,7 @@ pipeline {
     }
     stage('Package') {
       steps {
-        sh 'sudo zip -r emp_det.zip app.py'
+        sh 'zip -r emp_det.zip app.py'
         archiveArtifacts artifacts: 'emp_det.zip'
       }
     }
