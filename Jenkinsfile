@@ -1,20 +1,44 @@
-pipeline{
-  agent any
-  stages{
-    stage ('zip_the_application'){
-     steps{
-        sh """ echo "in the zipping process"
-            zip Devops
-            """
+pipeline {
+    agent any
+    environment {
+        GIT_BRANCH  = 'main'
+        REPO_URL    = 'https://github.com/Random139/DevopsTest'
+        S3_BUCKET   = 'demo-bucket'
+        S3_KEY      = 'emp_det.zip'
+        LAMBDA_NAME = 'Emp_details'
+        AWS_REGION  = 'ap-south-1'
+        ROLE_ARN    = 'arn:aws:iam::873046390774:role/Lambda_db_access'
+    }
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: "${GIT_BRANCH}", url: "${REPO_URL}"
+            }
         }
+        stage('Package') {
+            steps {
+                sh 'zip -r emp_det.zip lambda_function.py'
+                archiveArtifacts artifacts: 'emp_det.zip'
+            }
         }
-     stage('create'){
-        steps{
-          sh '''
-                aws s3api create-bucket --bucket my-demo-bucket --region ap-south-1 --create-bucket-configuration LocationConstraint=ap-south-1
-                aws s3 cp Devops.zip s3://my-demo-bucket/
-        '''
+        stage('Upload to S3') {
+            steps {
+                sh "aws s3 cp emp_det.zip s3://${S3_BUCKET}/${S3_KEY} --region ${AWS_REGION}"
+            }
         }
-     }
-  }
+        stage('Deploy Lambda') {
+            steps {
+                script {
+                    def ret = sh(script: "aws lambda update-function-code --function-name ${LAMBDA_NAME} --s3-bucket ${S3_BUCKET} --s3-key ${S3_KEY} --region ${AWS_REGION}", returnStatus: true)
+                    if (ret != 0) {
+                        sh "aws lambda create-function --function-name ${LAMBDA_NAME} --runtime python3.9 --role ${ROLE_ARN} --handler lambda_function.handler --code S3Bucket=${S3_BUCKET},S3Key=${S3_KEY} --region ${AWS_REGION}"
+                    }
+                }
+            }
+        }
+    }
+    post {
+        success { echo "Deployment succeeded" }
+        failure { echo "Deployment failed" }
+    }
 }
