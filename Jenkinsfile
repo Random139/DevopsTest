@@ -18,7 +18,8 @@ pipeline {
     stage('Package') {
       steps {
         sh 'zip -r emp_det.zip app.py'
-        archiveArtifacts artifacts: 'emp_det.zip'
+        archiveArtifacts artifacts: 'emp_det.zip
+        aws sts get-caller-identity --region ap-south-1'
       }
     }
     stage('Upload to S3') {
