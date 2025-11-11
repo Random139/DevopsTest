@@ -17,7 +17,7 @@ pipeline {
         }
         stage('Upload to S3') {
             steps {
-                sh "aws s3 cp emp_det.zip s3://${S3_BUCKET}/${S3_KEY} --region ${AWS_REGION}"
+                sh "aws s3 cp emp_det.zip s3://${S3_BUCKET}/ --region ${AWS_REGION}"
             }
         }
         stage('Deploy Lambda') {
